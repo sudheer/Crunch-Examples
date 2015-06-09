@@ -48,7 +48,6 @@ public class ParquetPipeline extends Configured implements Tool {
         
         Path inPath = new Path(inputPath);
         
-        // Create an object to coordinate pipeline creation and execution.
         Pipeline pipeline = new MRPipeline(ParquetPipeline.class, getConf());
         
         PCollection<Record> records = pipeline.read(new AvroParquetFileSource<Record>(inPath, Avros.generics(schema)));
@@ -59,7 +58,6 @@ public class ParquetPipeline extends Configured implements Tool {
         
         count.write(To.textFile(outputPath));
 
-        // Execute the pipeline as a MapReduce.
         PipelineResult result = pipeline.done();
         
         return result.succeeded() ? 0 : 1;

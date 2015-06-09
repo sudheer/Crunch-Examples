@@ -10,6 +10,7 @@ import org.apache.crunch.PGroupedTable;
 import org.apache.crunch.PTable;
 import org.apache.crunch.Pair;
 import org.apache.crunch.Pipeline;
+import org.apache.crunch.PipelineResult;
 import org.apache.crunch.impl.mr.MRPipeline;
 import org.apache.crunch.io.From;
 import org.apache.crunch.io.To;
@@ -23,6 +24,9 @@ import org.w2b.crunch.dofn.OrderTotalDoFn;
 import org.w2b.crunch.filterfn.OrdersFilterFn;
 import org.w2b.crunch.mapfn.OrderItemsMapFn;
 import org.w2b.crunch.mapfn.OrdersMapFn;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 public class AvroPipeline extends Configured implements Tool {
   
@@ -67,9 +71,12 @@ public class AvroPipeline extends Configured implements Tool {
     
     total.write(To.textFile(new Path(outputPath)));
     
-    getConf().set("crunch.planner.dotfile.outputdir", "/tmp/crunch-demo/dot/");
+    PipelineResult r = pipeline.done();
     
-    return pipeline.done().succeeded() ? 0 : 1;
+    String dot = pipeline.getConfiguration().get("crunch.planner.dotfile");
+    Files.write(dot, new File("pipeline.dot"), Charsets.UTF_8);
+    
+    return r.succeeded() ? 0 : 1;
   }
   
   public static void validateArgs(String[] args) throws Exception {

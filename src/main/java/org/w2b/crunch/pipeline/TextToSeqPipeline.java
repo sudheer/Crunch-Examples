@@ -30,13 +30,10 @@ public class TextToSeqPipeline extends Configured implements Tool {
         String inputPath = args[0];
         String outputPath = args[1];
         
-        // Create an object to coordinate pipeline creation and execution.
         Pipeline pipeline = new MRPipeline(TextToSeqPipeline.class, getConf());
         
-        // Reference a given avro file as a collection of Record's.
         PCollection<String> records = pipeline.readTextFile(inputPath);
         
-        // Instruct the pipeline to write the resulting records to a sequence file.
         pipeline.write(records,To.sequenceFile(outputPath));
 
         // Execute the pipeline as a MapReduce.

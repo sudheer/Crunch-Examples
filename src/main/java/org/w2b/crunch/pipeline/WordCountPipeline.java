@@ -1,5 +1,7 @@
 package org.w2b.crunch.pipeline;
 
+import java.io.File;
+
 import org.apache.crunch.PCollection;
 import org.apache.crunch.PTable;
 import org.apache.crunch.Pipeline;
@@ -13,6 +15,9 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.w2b.crunch.dofn.Tokenizer;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 
 /**
@@ -49,10 +54,12 @@ public class WordCountPipeline extends Configured implements Tool {
 
         pipeline.writeTextFile(counts, outputPath);
         
-        getConf().set("crunch.planner.dotfile.outputdir", "/tmp/cloudera/dotfile");
-        
         // Execute the pipeline as a MapReduce.
         PipelineResult result = pipeline.done();
+        
+        // writing the dot file for viewing execution graph
+        String dot = pipeline.getConfiguration().get("crunch.planner.dotfile");
+        Files.write(dot, new File("pipeline.dot"), Charsets.UTF_8);
         
         for (StageResult r : result.getStageResults()) {
         	System.out.println("stage1: " +r.getStageId());
